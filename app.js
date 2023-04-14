@@ -14,12 +14,62 @@ function loadJSONP(url, callback) {
     // Display functions
     // ###############################################
 
+    function animateHeader(){
+        //animate overall score
+        var headerScore = document.getElementById('header-overall-score');
+        var headerLevelScore = document.getElementById("header-level-score");
+ 
+        var newScore = Math.round(overallScore);
+        var oldScore = Math.round(lastScore);
+
+        var newScoreLevel = Math.round(levelScore);
+        var oldScoreLevel = Math.round(lastScoreLevel);
+
+
+        // Set the animation duration (in milliseconds)
+        var duration = 500;
+
+        // Set the interval (in milliseconds) at which to update the score
+        var interval = 10;
+
+        // Calculate the number of steps and the increment value
+        var steps = Math.ceil(duration / interval);
+        var increment = (newScore - oldScore) / steps;
+
+        // Create a function to update the score
+        function updateScore() {
+        // Update the score
+            lastScore += increment;
+            lastScoreLevel += increment;
+            headerScore.innerHTML = "Score: " + Math.round(lastScore);
+            headerLevelScore.innerHTML = "Level Score: " + Math.round(lastScoreLevel);
+
+            // Check if we've reached the new score
+            if (lastScore >= newScore) {
+                // Stop the animation
+                clearInterval(animation);
+
+                // Set the final score
+                headerScore.innerHTML = "Score: " + newScore;
+                headerLevelScore.innerHTML = "Level Score: " + newScoreLevel;
+            }
+        }
+
+        // Start the animation
+        var animation = setInterval(updateScore, interval);
+    };
+
     function displayHeader(){
         //console.log("IN header: " + overallScore + " " + levelScore + " " + scoreNeeded + " " + level)
-        var headerScore = document.getElementById("header-overall-score");
-        headerScore.innerHTML = "Score: " + Math.round(overallScore);
-        var headerLevelScore = document.getElementById("header-level-score");
-        headerLevelScore.innerHTML = "Level Score: " + Math.round(levelScore);
+        //var headerScore = document.getElementById("header-overall-score");
+        //headerScore.innerHTML = "Score: " + Math.round(overallScore);
+        animateHeader();
+
+
+        
+
+        //var headerLevelScore = document.getElementById("header-level-score");
+        //headerLevelScore.innerHTML = "Level Score: " + Math.round(levelScore);
         var headerScoreNeeded = document.getElementById("header-score-needed");
         headerScoreNeeded.innerHTML = "Score needed: " + scoreNeeded;
         var headerLevel = document.getElementById("header-level");
@@ -225,6 +275,7 @@ function loadJSONP(url, callback) {
     function initialize_level(level){
         // reset level score
         levelScore = 0;
+        lastScoreLevel = 0;
         // reset counter
         counter = 0;
         // get counter needed
@@ -239,8 +290,10 @@ function loadJSONP(url, callback) {
         
         
         // every time
+        lastScore = overallScore;
         overallScore += tmp_score;
         console.log("overall score: " + overallScore)
+        lastScoreLevel = levelScore;
         levelScore += tmp_score;
         counter += 1;
         console.log("counter: " + counter)
@@ -295,6 +348,8 @@ function loadJSONP(url, callback) {
     var overallScore = 0;
     var levelScore = 0;
     var scoreNeeded = 0;
+    var lastScore = 0;
+    var lastScoreLevel = 0;
     var level = 0;
     var distanceLine = null;
     var circle = null;
