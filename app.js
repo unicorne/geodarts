@@ -25,6 +25,10 @@ function loadJSONP(url, callback) {
         var headerLevel = document.getElementById("header-level");
         var tmp_level = level + 1;
         headerLevel.innerHTML = "Level: " + tmp_level;
+        var headerCounter = document.getElementById("header-counter");
+        var tmp_counter = counter + 1;
+        var tmp_max_counter = counter_needed;
+        headerCounter.innerHTML = tmp_counter + "/" + tmp_max_counter;
     }
 
     function displayTimerText(targetname){
@@ -121,9 +125,15 @@ function loadJSONP(url, callback) {
         // Get the scores
         const startMessage = document.querySelector('.level-message');
 
-        var tmp_level = level + 1;
+        var tmp_level = level + 2;
         // Set the initial scores
         startMessage.textContent = "Congrats you reached level " + tmp_level + "!";
+
+        // display score reached and needed
+        const score_reached = document.querySelector('.score-reached-level');
+        score_reached.textContent = Math.round(levelScore);
+        const score_needed = document.querySelector('.score-needed-level');
+        score_needed.textContent = Math.round(scoreNeeded);
 
 
         // Add a click event listener to the button to close the modal
@@ -147,7 +157,7 @@ function loadJSONP(url, callback) {
 
 
         // Set the initial scores
-        startMessage.textContent = "Gam over you reached " + score + " points!";
+        startMessage.textContent = "Game over you reached " + score + " points!";
 
 
         // Add a click event listener to the button to close the modal
@@ -156,6 +166,7 @@ function loadJSONP(url, callback) {
             modal.style.display = 'none';
             animation.cancel();
             animation.play();
+            location.reload();
         });
     }
 
@@ -216,6 +227,8 @@ function loadJSONP(url, callback) {
         levelScore = 0;
         // reset counter
         counter = 0;
+        // get counter needed
+        counter_needed = locations[level].counter_max;
         // reset score needed
         scoreNeeded = locations[level].score_needed;
         displayHeader();
@@ -248,6 +261,9 @@ function loadJSONP(url, callback) {
             initialize_level(level);
 
             }
+            else {
+                showGameoverModal(score);
+            }
 
         }
         displayHeader();
@@ -269,7 +285,7 @@ function loadJSONP(url, callback) {
             display_target_name = name;
         }
         displayTimerText(display_target_name);
-        mymap.setView([0,0], 2);
+        mymap.setView([20,0], 2);
     }
 
 
@@ -283,7 +299,7 @@ function loadJSONP(url, callback) {
     var distanceLine = null;
     var circle = null;
     var counter = 0;
-    var counter_needed = 5;
+    var counter_needed = locations[0].counter_max;
     var DURATION_TIMER = 10;
     var MAX_LEVEL = 4;
     var show_country = true;
@@ -303,12 +319,12 @@ function loadJSONP(url, callback) {
     });
 
     // Map
-    var mymap = L.map('mapid').setView([0, 0], 2);
+    var mymap = L.map('mapid').setView([20, 20], 2);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
 	subdomains: 'abcd',
-	maxZoom: 14
+	maxZoom: 12
     }).addTo(mymap);
 
     function getRandomColor() {
@@ -342,7 +358,7 @@ function loadJSONP(url, callback) {
     draggable: true,
     autoPan: true
     }).addTo(mymap);
-    var targetMarker = L.marker([45.5231, -122.6765])
+    var targetMarker = L.marker([45.5231, -122.6765], color='red');
 
     initialize_level(0);
 
