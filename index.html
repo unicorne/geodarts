@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adding one marker</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+
+    <header>
+        <div class="left">
+          <h1>Traveller IQ Remake</h1>
+        </div>
+        <div class="right">
+          <div class="score-box">
+            <span id="header-overall-score" class="score-main"></span>
+            <hr>
+            <span id="header-level-score" class="score"></span>
+            <hr>
+            <span id="header-score-needed" class="score"></span>
+            <hr>
+            <span id="header-level" class="score"></span>
+          </div>
+        </div>
+      </header>
+
+      <div id="timer-container">
+        <div id="timer-bar"></div>
+        <div id="timer-text-container">
+          <div id="timer-text"></div>
+        </div>
+      </div>
+
+
+     <div id="map-container">
+        <div id="mapid"> </div>
+     </div>
+
+     <div class="buttons">
+        <button class="button" id="buttonid">Calculate Distance</button>
+        <!--<button class="button" id="Next Target">Next</button>-->
+        </div>
+
+     <div class="modal">
+        <div class="modal-content">
+          <p><span class="score1"></span></p>
+          <p><span class="score2"></span></p>
+          <p class="modal-score"></p>
+          <button class="close-button">Close</button>
+        </div>
+      </div>
+
+    <div class="start-modal">
+        <div class="modal-content-start">
+          <p><span class="start-message"> Welcome! </span></p>
+          <button class="close-button-start">Close</button>
+        </div>
+      </div>
+
+    <div class="level-modal">
+        <div class="modal-content-level">
+            <p><span class="level-message"> Congrats </span></p>
+            <p>Score 1: <span class="score-reached-level"></span></p>
+            <p>Score 2: <span class="score-needed-level"></span></p>
+            <button class="close-button-level">Close</button>
+        </div>
+      </div>
+
+      <div class="game-over-modal">
+        <div class="modal-content-gameover">
+          <p><span class="gameover-message"> Welcome! </span></p>
+          <button class="close-button-gameover">Restart</button>
+        </div>
+      </div>
+
+
+      
+      
+      
+
+    
+      
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+    <!--<script type="module" src="locations.js"></script>-->
+    <script src="app.js"></script>
+  </body>
+</html>
