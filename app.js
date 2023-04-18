@@ -237,14 +237,15 @@ function loadJSONP(url, callback) {
     }
 
     function calculateScore(distance, timeleft){
-        var maxDistance = 12000000;
-        var tmp_score = maxDistance/distance;
-        var tmp_score = Math.round(tmp_score);
+        var maxDistance = 20000000;
+        var distance_km = distance / 1000;
+        var tmp_score = Math.exp(-0.001*(maxDistance-(maxDistance-distance_km)))*6000;
+        //var tmp_score = Math.round(tmp_score);
         // convert timeleft to float
         var timeleft = parseFloat(timeleft);
         //console.log(timeleft)
         //console.log(tmp_score)
-        tmp_score = tmp_score + 100*timeleft;
+        tmp_score = tmp_score + 50*timeleft;
 
         return tmp_score;
     }
