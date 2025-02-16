@@ -32,6 +32,7 @@ function loadJSONP(url, callback) {
         // Set the interval (in milliseconds) at which to update the score
         var interval = 10;
 
+
         // Calculate the number of steps and the increment value
         var steps = Math.ceil(duration / interval);
         var increment = (newScore - oldScore) / steps;
@@ -65,7 +66,8 @@ function loadJSONP(url, callback) {
         //headerScore.innerHTML = "Score: " + Math.round(overallScore);
         animateHeader();
 
-
+        var levelNameHeader = document.getElementById("level_name");
+        levelNameHeader.innerHTML = levelName;
         
 
         //var headerLevelScore = document.getElementById("header-level-score");
@@ -153,7 +155,7 @@ function loadJSONP(url, callback) {
 
 
         // Set the initial scores
-        startMessage.textContent = "Welcome!";
+        startMessage.textContent = "Welcome! You have 10 seconds to guess the location of the city on the map. Click on the map to make your guess. Press the button or f or Enter to submit your guess. Good luck!";
 
 
     // Add a click event listener to the button to close the modal
@@ -283,45 +285,48 @@ function loadJSONP(url, callback) {
         counter_needed = locations[level].counter_max;
         // reset score needed
         scoreNeeded = locations[level].score_needed;
+        // level name
+        levelName = locations[level].level_name;
         displayHeader();
         nextTarget();
     }
 
-    function updateGameState(tmp_score){
-        
-        
-        // every time
+    async function updateGameState(tmp_score) {
+        // record the guess for this round
+        levelGuesses.push({
+          guess: draggableMarker.getLatLng(),
+          target: targetMarker.getLatLng()
+        });
+      
         lastScore = overallScore;
         overallScore += tmp_score;
-        console.log("overall score: " + overallScore)
+        console.log("overall score: " + overallScore);
         lastScoreLevel = levelScore;
         levelScore += tmp_score;
         counter += 1;
-        console.log("counter: " + counter)
+        console.log("counter: " + counter);
+      
+        if (counter >= counter_needed) {
+          // When level is finished, display the level results map
+          //await showLevelGuessesMap();
 
-
-        if (counter == counter_needed){
-            // check level criteria
-            console.log("Counter reached")
-            if (levelScore >= scoreNeeded){
-            // check game over
-                level += 1;
-                if (level == MAX_LEVEL){
-                    alert("You won")
-                }
-
-            // level up
-            showLevelModal(level-1);
+            
+      
+          // Now check if the level criteria were met
+          if (levelScore >= scoreNeeded) {
+            level += 1;
+            if (level == MAX_LEVEL) {
+              alert("Congratugulations. You won! Your score is: " + overallScore);
+            }
+            showLevelModal(level - 1);
             initialize_level(level);
-
-            }
-            else {
-                showGameoverModal(score);
-            }
-
+          } else {
+            showGameoverModal(overallScore);
+          }
         }
         displayHeader();
-    };
+      }
+      
 
     function nextTarget(){
         // remove Target MArker from map
@@ -342,6 +347,43 @@ function loadJSONP(url, callback) {
         mymap.setView([20,0], 2);
     }
 
+    function showLevelGuessesMap() {
+        return new Promise(resolve => {
+          const modal = document.querySelector('.level-results-modal');
+          modal.style.display = 'flex';
+      
+          // Create a new Leaflet map inside the modal’s container
+          const resultMap = L.map('level-result-map').setView([20, 0], 2);
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20,
+            doubleClickZoom: 5,
+            zoomAnimationDuration: 200
+          }).addTo(resultMap);
+      
+          // For each guess, add markers and a connecting polyline
+          levelGuesses.forEach(item => {
+            // Add target marker in green
+            L.circleMarker(item.target, { color: 'green', radius: 8 }).addTo(resultMap);
+            // Add guess marker in red
+            L.circleMarker(item.guess, { color: 'red', radius: 8 }).addTo(resultMap);
+            // Connect the two markers with a red line
+            L.polyline([item.target, item.guess], { color: 'red' }).addTo(resultMap);
+          });
+      
+          // Listen for close button click to hide the modal
+          const closeButton = document.querySelector('.close-button-level-results');
+          closeButton.addEventListener('click', function handler() {
+            modal.style.display = 'none';
+            resultMap.remove(); // remove the result map
+            closeButton.removeEventListener('click', handler);
+            resolve();
+          });
+        });
+      }
+      
+
 
     // Load locations
 
@@ -357,8 +399,10 @@ function loadJSONP(url, callback) {
     var counter = 0;
     var counter_needed = locations[0].counter_max;
     var DURATION_TIMER = 10;
-    var MAX_LEVEL = 4;
+    var MAX_LEVEL = 7;
     var show_country = true;
+    let levelGuesses = [];
+    var levelName = "";
 
 
     displayHeader();
@@ -428,15 +472,20 @@ function loadJSONP(url, callback) {
         draggableMarker.setLatLng(e.latlng);
       });
 
+    // Create a reusable handler function
+    const handleButtonAction = async () => {
+        zoomToTarget();
+        const distance = calculateDistance();
+        const timeleft = calculateTimeleft();
+        const score = calculateScore(distance, timeleft);
+        await showModal(score, distance, timeleft);
+        updateGameState(score);
+    };
+
     // add event listener
     var demoButton = document.getElementById('buttonid');
     demoButton.addEventListener('click', async function() {
-        zoomToTarget();
-        distance = calculateDistance();
-        timeleft = calculateTimeleft();
-        score = calculateScore(distance, timeleft);
-        await showModal(score, distance, timeleft);
-        updateGameState(score);
+        handleButtonAction();
     });
     animation.addEventListener('finish', async function() {
         zoomToTarget();
@@ -446,6 +495,16 @@ function loadJSONP(url, callback) {
         await showModal(score, distance, timeleft);
         updateGameState(score);
     });
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            handleButtonAction();
+        }
+      });
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'f') {
+            handleButtonAction();
+        }
+      });
 
 });
 

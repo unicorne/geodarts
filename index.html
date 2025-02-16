@@ -18,8 +18,11 @@
           <h1>Traveller IQ Remake</h1>
         </div>
         <hr>
+
         <div class="right">
           <div class="score-box">
+            <span id="level_name" class="score"></span>
+            <hr>
             <span id="header-overall-score" class="score-main"> Score: </span>
             <hr>
             <span id="header-level-score" class="score"></span>
@@ -79,6 +82,13 @@
         <div class="modal-content-gameover">
           <p><span class="gameover-message"> Welcome! </span></p>
           <button class="close-button-gameover">Restart</button>
+        </div>
+      </div>
+
+      <div class="level-results-modal">
+        <div class="modal-content-level-results">
+          <div id="level-result-map" style="width:90vw; height:450px; border:5px solid black; border-radius:20px;"></div>
+          <button class="close-button-level-results">Close</button>
         </div>
       </div>
 
